@@ -1,5 +1,5 @@
 import { listAssets, ASSET_SOURCES, ASSET_TYPES, ASSET_SOURCE_LABELS } from "@/modules/assets";
-import { Empty, Field, fmtDate } from "@/components/ui";
+import { Masthead, SectionHead, Empty, Field, StatusTone, fmtDate, joinMeta } from "@/components/ui";
 import { createAssetAction } from "../actions";
 
 export const dynamic = "force-dynamic";
@@ -13,22 +13,24 @@ export default async function AssetsPage({
   const assets = await listAssets({ source, type });
 
   return (
-    <div className="space-y-6">
-      <header>
-        <h1 className="text-xl font-semibold">Assets</h1>
-        <p className="mt-1 text-sm text-navy-500">
-          Media has to live at a public, non-expiring URL. Publishing providers fetch it at
-          publish time, not when you schedule.
-        </p>
-      </header>
+    <div className="space-y-10">
+      <Masthead
+        title="Assets"
+        lede="Media has to live at a public, non expiring URL. Providers fetch it at publish time, not when you schedule."
+      />
 
-      <details className="card p-5">
-        <summary className="cursor-pointer text-sm font-semibold">Add an asset</summary>
-        <form action={createAssetAction} className="mt-4 grid gap-4 sm:grid-cols-2">
+      <details className="border-y border-rule py-3.5">
+        <summary className="flex items-baseline gap-2 text-[0.9375rem]">
+          <span className="caret mark" aria-hidden="true">
+            &#8250;
+          </span>
+          Add an asset
+        </summary>
+        <form action={createAssetAction} className="mt-5 grid max-w-[40rem] gap-5 sm:grid-cols-2">
           <Field label="Title">
             <input name="title" required className="input" />
           </Field>
-          <Field label="File URL" hint="Public and non-expiring.">
+          <Field label="File URL" hint="Public and non expiring.">
             <input name="fileUrl" className="input" placeholder="https://..." />
           </Field>
           <Field label="Type">
@@ -75,53 +77,60 @@ export default async function AssetsPage({
             </Field>
           </div>
           <div className="sm:col-span-2">
-            <button className="btn-primary">Add</button>
+            <button className="btn btn-ink">Add</button>
           </div>
         </form>
       </details>
 
-      {assets.length === 0 ? (
-        <Empty title="No assets yet" hint="Add one above, or import a batch through the API." />
-      ) : (
-        <ul className="grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-4">
-          {assets.map((a) => (
-            <li key={a.id} className="card overflow-hidden">
-              <div className="aspect-square bg-cream-100">
-                {a.thumbnailUrl ? (
-                  // eslint-disable-next-line @next/next/no-img-element
-                  <img src={a.thumbnailUrl} alt="" className="h-full w-full object-cover" />
-                ) : (
-                  <div className="flex h-full items-center justify-center text-xs text-navy-500">
-                    {a.type}
-                  </div>
-                )}
-              </div>
-              <div className="p-3">
-                <p className="truncate text-sm font-medium">{a.title}</p>
-                <p className="text-xs text-navy-500">
-                  {ASSET_SOURCE_LABELS[a.source]} · {fmtDate(a.createdAt)}
+      <section>
+        <SectionHead title="Library" count={assets.length} />
+        {assets.length === 0 ? (
+          <Empty
+            title="No assets yet."
+            hint="Add one above, or import a batch through the API."
+          />
+        ) : (
+          /*
+           * Plates, not crops. Each asset is shown whole on a sunk ground with
+           * its particulars beneath, because how a photo gets cropped is an
+           * editorial decision and the library does not get to make it quietly.
+           */
+          <ul className="grid grid-cols-2 gap-x-5 gap-y-8 sm:grid-cols-3 lg:grid-cols-4">
+            {assets.map((a) => (
+              <li key={a.id}>
+                <div className="plate aspect-4/3 w-full">
+                  {a.thumbnailUrl ? (
+                    // eslint-disable-next-line @next/next/no-img-element
+                    <img src={a.thumbnailUrl} alt="" />
+                  ) : (
+                    <span className="mark">{a.type}</span>
+                  )}
+                </div>
+                <p className="mt-2 truncate text-sm">{a.title}</p>
+                <p className="mark mt-0.5 truncate">
+                  {joinMeta([ASSET_SOURCE_LABELS[a.source], fmtDate(a.createdAt)])}
                 </p>
-                <div className="mt-1 flex flex-wrap gap-1">
-                  <span
-                    className={`chip ${
+                <div className="mt-1.5 flex flex-wrap gap-x-4 gap-y-1">
+                  <StatusTone
+                    tone={
                       a.rightsStatus === "approved"
-                        ? "bg-navy-100 text-navy-900"
+                        ? "settled"
                         : a.rightsStatus === "restricted"
-                          ? "bg-rust-100 text-rust-600"
-                          : "bg-cream-100 text-navy-500"
-                    }`}
+                          ? "act"
+                          : "missing"
+                    }
                   >
-                    {a.rightsStatus}
-                  </span>
+                    {a.rightsStatus === "approved" ? "cleared" : a.rightsStatus}
+                  </StatusTone>
                   {a.minorReleaseStatus === "unconfirmed" ? (
-                    <span className="chip bg-rust-500 text-white">minor unconfirmed</span>
+                    <StatusTone tone="act">minor unconfirmed</StatusTone>
                   ) : null}
                 </div>
-              </div>
-            </li>
-          ))}
-        </ul>
-      )}
+              </li>
+            ))}
+          </ul>
+        )}
+      </section>
     </div>
   );
 }

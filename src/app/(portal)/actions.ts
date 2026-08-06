@@ -2,6 +2,7 @@
 
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
+import { signOut } from "@/core/auth";
 import { requireActor } from "@/core/auth/guards";
 import {
   changeStatus,
@@ -38,6 +39,10 @@ function lines(fd: FormData, key: string) {
     .split("\n")
     .map((s) => s.trim())
     .filter(Boolean);
+}
+
+export async function signOutAction() {
+  await signOut({ redirectTo: "/login" });
 }
 
 export async function createContentAction(fd: FormData) {

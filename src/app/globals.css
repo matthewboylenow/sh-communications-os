@@ -1,64 +1,737 @@
 @import "tailwindcss";
 
-@theme {
-  --color-navy-50: #eef2f8;
-  --color-navy-100: #d6e0ee;
-  --color-navy-500: #2a4570;
-  --color-navy-700: #1a2e52;
-  --color-navy-900: #12233f;
+/*
+ * Saint Helen Communications OS. The Galley.
+ *
+ * See DESIGN.md for why. The short version: the thing a person does here is
+ * read a draft and judge it, so prose is set at a real measure and the
+ * system's apparatus lives in the margin beside it, the way proof marks do.
+ *
+ * Rules to keep, in order of how easily they erode:
+ *   One accent. Rust means a person must act, and it means nothing else.
+ *   Gold means a fact is missing. There is no third colour and no green.
+ *   Six type sizes. Serif for words, sans for apparatus, mono for measures.
+ *   Radius 2px on controls, 0 everywhere else. The parish mark is a square.
+ *   Separation comes from rules and space. A box has to earn itself.
+ */
 
-  --color-rust-100: #f6e3da;
-  --color-rust-500: #b4532a;
-  --color-rust-600: #97431f;
-
-  --color-gold-100: #f6edd6;
-  --color-gold-500: #c8a44d;
-  --color-gold-600: #a8863a;
-
-  --color-cream-50: #faf7f1;
-  --color-cream-100: #f5efe3;
-  --color-cream-200: #e9e0cd;
-
-  --font-sans: "Inter", ui-sans-serif, system-ui, -apple-system, sans-serif;
-}
+@custom-variant dark (&:where([data-theme="dark"], [data-theme="dark"] *));
 
 :root {
   color-scheme: light;
+
+  --paper: #f2efe7;
+  --sheet: #fbf9f4;
+  --sunk: #e7e2d6;
+
+  --ink: #1b1f26;
+  --ink-2: #4d5560;
+  --ink-3: #7f8894;
+
+  --rule: #d8d1c0;
+  --rule-heavy: #1b1f26;
+
+  --accent: #a8451f;
+  --accent-quiet: #f0dfd5;
+  --gold: #8a6a1e;
+  --gold-quiet: #efe7cf;
+
+  --grain: 0.028;
+}
+
+[data-theme="dark"] {
+  color-scheme: dark;
+
+  --paper: #131417;
+  --sheet: #1a1c20;
+  --sunk: #0e0f12;
+
+  --ink: #eae6de;
+  --ink-2: #a5acb6;
+  --ink-3: #727a85;
+
+  --rule: #282c32;
+  --rule-heavy: #eae6de;
+
+  --accent: #d4744c;
+  --accent-quiet: #33211a;
+  --gold: #c5a154;
+  --gold-quiet: #2b2416;
+
+  --grain: 0.045;
+}
+
+@theme inline {
+  --color-paper: var(--paper);
+  --color-sheet: var(--sheet);
+  --color-sunk: var(--sunk);
+  --color-ink: var(--ink);
+  --color-ink-2: var(--ink-2);
+  --color-ink-3: var(--ink-3);
+  --color-rule: var(--rule);
+  --color-rule-heavy: var(--rule-heavy);
+  --color-accent: var(--accent);
+  --color-accent-quiet: var(--accent-quiet);
+  --color-gold: var(--gold);
+  --color-gold-quiet: var(--gold-quiet);
+
+  --font-serif: var(--font-text-serif), ui-serif, Georgia, serif;
+  --font-sans: var(--font-ui-sans), ui-sans-serif, system-ui, sans-serif;
+  --font-mono: var(--font-mark-mono), ui-monospace, SFMono-Regular, monospace;
+}
+
+/* ---------------------------------------------------------------- base --- */
+
+*,
+*::before,
+*::after {
+  border-color: var(--rule);
+}
+
+html {
+  -webkit-text-size-adjust: 100%;
 }
 
 body {
-  background: var(--color-cream-50);
-  color: var(--color-navy-900);
+  background: var(--paper);
+  color: var(--ink);
+  font-family: var(--font-sans);
+  font-size: 1rem;
+  line-height: 1.5;
 }
 
-.card {
-  @apply rounded-lg border border-cream-200 bg-white shadow-sm;
+/* Tooth on the paper. Enough to read as a surface, not as noise. */
+body::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  opacity: var(--grain);
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4'/%3E%3C/filter%3E%3Crect width='160' height='160' filter='url(%23n)'/%3E%3C/svg%3E");
 }
 
-/* Tailwind 4 will not @apply a plain class defined in the same sheet, so the
-   shared button shape is a real utility rather than a base class. */
-@utility btn {
-  @apply inline-flex items-center justify-center gap-2 rounded-md px-3 py-2 text-sm font-medium transition;
+body > * {
+  position: relative;
+  z-index: 1;
 }
-.btn-primary {
-  @apply btn bg-navy-900 text-white hover:bg-navy-700 disabled:opacity-40;
+
+::selection {
+  background: var(--accent-quiet);
+  color: var(--ink);
 }
-.btn-secondary {
-  @apply btn border border-cream-200 bg-white text-navy-900 hover:bg-cream-100 disabled:opacity-40;
+
+:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
 }
-.btn-danger {
-  @apply btn border border-rust-500 bg-white text-rust-600 hover:bg-rust-100;
+
+/* --------------------------------------------------------- the six sizes --- */
+
+/* 12px mono. Marks, counts, timestamps, anything carrying a unit. */
+.mark {
+  font-family: var(--font-mono);
+  font-size: 0.75rem;
+  line-height: 1.45;
+  letter-spacing: 0.01em;
+  font-variant-numeric: tabular-nums;
+  color: var(--ink-3);
 }
+
+/* 14px sans. Labels, table cells, navigation, meta. */
+.apparatus {
+  font-size: 0.875rem;
+  line-height: 1.5;
+  color: var(--ink-2);
+}
+
+/* 17px serif at reading leading. Caption prose and lede. */
+.read {
+  font-family: var(--font-serif);
+  font-optical-sizing: auto;
+  font-size: 1.0625rem;
+  line-height: 1.62;
+  letter-spacing: -0.003em;
+  color: var(--ink);
+}
+
+/* 22px serif. Section headings. */
+.head {
+  font-family: var(--font-serif);
+  font-optical-sizing: auto;
+  font-size: 1.375rem;
+  font-weight: 500;
+  line-height: 1.2;
+  letter-spacing: -0.012em;
+}
+
+/* 32px serif. Page titles, once per screen. */
+.masthead-title {
+  font-family: var(--font-serif);
+  font-optical-sizing: auto;
+  font-size: 2rem;
+  font-weight: 500;
+  line-height: 1.12;
+  letter-spacing: -0.02em;
+}
+
+/* 56px serif. The one figure on Today, and nothing else in the app. */
+.figure-large {
+  font-family: var(--font-serif);
+  font-optical-sizing: auto;
+  font-size: 3.5rem;
+  font-weight: 400;
+  line-height: 0.9;
+  letter-spacing: -0.03em;
+  font-variant-numeric: tabular-nums;
+}
+
+.serif {
+  font-family: var(--font-serif);
+  font-optical-sizing: auto;
+}
+
+.tnum {
+  font-variant-numeric: tabular-nums;
+}
+
+/* ------------------------------------------------------------ framing --- */
+
+/*
+ * The recurring device: a nameplate rule under the page title, and a hairline
+ * running off the end of every section heading. Two weights of rule carry the
+ * whole hierarchy, so nothing needs to be put in a box to look separate.
+ */
+/*
+ * The nameplate. Title left, dateline right, both sitting on the heavy rule.
+ * On a phone the dateline drops under the title and the rule stays put, so the
+ * page still opens with the same shape.
+ */
+.masthead {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 0.5rem 1.5rem;
+  padding-bottom: 0.625rem;
+  border-bottom: 2px solid var(--rule-heavy);
+}
+
+/*
+ * A section heading, its count, then a hairline running off to the right and
+ * an optional unit at the far end. The count sits next to the words it counts
+ * rather than being exiled to the other side of the page.
+ */
+.head-rule {
+  display: flex;
+  align-items: baseline;
+  gap: 0.625rem;
+}
+.head-rule::before {
+  content: "";
+  order: 2;
+  flex: 1 1 auto;
+  min-width: 1.5rem;
+  border-top: 1px solid var(--rule);
+  transform: translateY(-0.28em);
+}
+.head-rule > .head-aside {
+  order: 3;
+}
+
+/* --------------------------------------------------------- the galley --- */
+
+/*
+ * The two track grid. Emit a pair of children per row, prose then marks, and
+ * the marks sit level with the paragraph they concern. Under 1180px the margin
+ * track collapses and each set of marks falls in directly beneath its own
+ * paragraph, still attached by a rule, which is the behaviour we want on a
+ * phone anyway.
+ */
+.galley {
+  display: grid;
+  grid-template-columns: minmax(0, 40rem) 16.5rem;
+  column-gap: 2.5rem;
+  align-items: start;
+}
+
+.galley > .margin-note {
+  padding-top: 0.25rem;
+}
+
+@media (max-width: 1180px) {
+  .galley {
+    grid-template-columns: minmax(0, 1fr);
+    row-gap: 0;
+  }
+  .galley > .margin-note {
+    margin: 0.5rem 0 1.25rem;
+    padding: 0 0 0 0.875rem;
+    border-left: 2px solid var(--rule);
+  }
+  .galley > .margin-note:empty {
+    display: none;
+    margin: 0;
+  }
+}
+
+.measure {
+  max-width: 40rem;
+}
+
+/* A margin mark. Never louder than the prose it annotates. */
+.note {
+  display: grid;
+  grid-template-columns: 0.875rem minmax(0, 1fr);
+  gap: 0.5rem;
+  font-family: var(--font-mono);
+  font-size: 0.75rem;
+  line-height: 1.5;
+  color: var(--ink-3);
+}
+.note + .note {
+  margin-top: 0.625rem;
+}
+.note[data-level="error"] {
+  color: var(--accent);
+}
+.note[data-level="warning"] {
+  color: var(--gold);
+}
+.note-glyph {
+  font-size: 0.8125rem;
+  line-height: 1.35;
+  text-align: center;
+}
+
+/* Proof marks in the prose itself. Wavy for a fault, dotted for a remark. */
+mark.flagged {
+  background: none;
+  color: inherit;
+  text-decoration-line: underline;
+  text-decoration-thickness: 1px;
+  text-underline-offset: 4px;
+}
+mark.flagged[data-level="error"] {
+  text-decoration-style: wavy;
+  text-decoration-color: var(--accent);
+}
+mark.flagged[data-level="warning"] {
+  text-decoration-style: wavy;
+  text-decoration-color: var(--gold);
+}
+mark.flagged[data-level="note"] {
+  text-decoration-style: dotted;
+  text-decoration-color: var(--ink-3);
+}
+
+/* --------------------------------------------------------- the status --- */
+
+/*
+ * Status is a word and a glyph, not a coloured pill. Colour appears only when
+ * the status asks something of a person, so a queue of ordinary rows reads as
+ * one colour and the exceptions jump out.
+ */
+.status {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4375rem;
+  font-family: var(--font-mono);
+  font-size: 0.75rem;
+  letter-spacing: 0.02em;
+  white-space: nowrap;
+  color: var(--ink-3);
+}
+.status-glyph {
+  width: 7px;
+  height: 7px;
+  flex: none;
+  border: 1px solid currentColor;
+}
+.status[data-tone="act"] {
+  color: var(--accent);
+}
+.status[data-tone="act"] .status-glyph {
+  background: currentColor;
+}
+.status[data-tone="missing"] {
+  color: var(--gold);
+}
+.status[data-tone="settled"] {
+  color: var(--ink-2);
+}
+.status[data-tone="settled"] .status-glyph {
+  background: currentColor;
+}
+.status[data-tone="retired"] {
+  text-decoration: line-through;
+}
+
+/* ------------------------------------------------------------ controls --- */
+
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  height: 2.25rem;
+  padding: 0 0.875rem;
+  border: 1px solid transparent;
+  border-radius: 2px;
+  font-size: 0.875rem;
+  font-weight: 500;
+  line-height: 1;
+  white-space: nowrap;
+  cursor: pointer;
+  transition:
+    background-color 130ms ease,
+    border-color 130ms ease,
+    color 130ms ease;
+}
+.btn:disabled {
+  opacity: 0.38;
+  cursor: not-allowed;
+}
+.btn-sm {
+  height: 1.875rem;
+  padding: 0 0.625rem;
+  font-size: 0.8125rem;
+}
+
+.btn-ink {
+  background: var(--ink);
+  color: var(--paper);
+}
+.btn-ink:not(:disabled):hover {
+  background: var(--ink-2);
+}
+
 .btn-approve {
-  @apply btn bg-rust-500 text-white hover:bg-rust-600 disabled:opacity-40;
+  background: var(--accent);
+  color: #fff;
 }
+.btn-approve:not(:disabled):hover {
+  background: color-mix(in srgb, var(--accent) 82%, black);
+}
+
+.btn-outline {
+  border-color: var(--rule);
+  color: var(--ink);
+}
+.btn-outline:not(:disabled):hover {
+  background: var(--sheet);
+  border-color: var(--ink-3);
+}
+
+.btn-quiet {
+  color: var(--ink-2);
+}
+.btn-quiet:not(:disabled):hover {
+  background: var(--sheet);
+  color: var(--ink);
+}
+
+.btn-danger {
+  border-color: color-mix(in srgb, var(--accent) 40%, transparent);
+  color: var(--accent);
+}
+.btn-danger:not(:disabled):hover {
+  background: var(--accent-quiet);
+}
+
+/* --------------------------------------------------------------- form --- */
 
 .label {
-  @apply block text-xs font-semibold uppercase tracking-wide text-navy-500;
+  display: block;
+  font-size: 0.8125rem;
+  font-weight: 500;
+  color: var(--ink-2);
 }
+
 .input {
-  @apply w-full rounded-md border border-cream-200 bg-white px-3 py-2 text-sm outline-none focus:border-navy-500;
+  width: 100%;
+  background: var(--sheet);
+  border: 1px solid var(--rule);
+  border-radius: 2px;
+  padding: 0.5rem 0.6875rem;
+  font-family: inherit;
+  font-size: 1rem;
+  line-height: 1.5;
+  color: var(--ink);
+  transition:
+    border-color 130ms ease,
+    box-shadow 130ms ease;
 }
-.chip {
-  @apply inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-xs font-medium;
+.input::placeholder {
+  color: var(--ink-3);
+}
+.input:hover {
+  border-color: var(--ink-3);
+}
+.input:focus {
+  outline: none;
+  border-color: var(--accent);
+  box-shadow: inset 0 0 0 1px var(--accent);
+}
+
+textarea.input {
+  resize: vertical;
+}
+
+/* The caption field is the one place a person writes prose, so it is set in
+   the reading face at the reading size, inside the measure. */
+textarea.input-prose {
+  font-family: var(--font-serif);
+  font-size: 1.0625rem;
+  line-height: 1.62;
+}
+
+select.input {
+  appearance: none;
+  padding-right: 2rem;
+  background-image: linear-gradient(45deg, transparent 50%, currentColor 50%),
+    linear-gradient(135deg, currentColor 50%, transparent 50%);
+  background-position: calc(100% - 15px) calc(50% + 1px), calc(100% - 11px) calc(50% + 1px);
+  background-size: 4px 4px, 4px 4px;
+  background-repeat: no-repeat;
+}
+
+input[type="checkbox"] {
+  accent-color: var(--accent);
+  width: 0.9375rem;
+  height: 0.9375rem;
+  border-radius: 0;
+}
+
+input[type="datetime-local"] {
+  font-family: var(--font-mono);
+  font-size: 0.875rem;
+}
+
+/* -------------------------------------------------------------- lists --- */
+
+/* A ruled list. Rows divided by hairlines, no boxes, hover tints the row. */
+.ruled > * + * {
+  border-top: 1px solid var(--rule);
+}
+
+.ruled-row {
+  display: block;
+  padding: 0.875rem 0;
+  transition: background-color 130ms ease;
+}
+a.ruled-row:hover,
+li:hover > a.ruled-row {
+  background: var(--sheet);
+  box-shadow:
+    -0.75rem 0 0 var(--sheet),
+    0.75rem 0 0 var(--sheet);
+}
+
+/* A definition list of facts. Two columns on desktop, stacked on a phone. */
+/* Column gap is zero so the row rule runs unbroken across both columns. The
+   space between label and value comes from padding instead. */
+.facts {
+  display: grid;
+  grid-template-columns: 9.5rem minmax(0, 1fr);
+}
+.facts > dt {
+  padding: 0.5rem 1.5rem 0.5rem 0;
+  font-size: 0.875rem;
+  color: var(--ink-3);
+}
+.facts > dd {
+  padding: 0.5rem 0;
+  font-size: 0.875rem;
+  color: var(--ink);
+  min-width: 0;
+}
+.facts > dt:not(:first-of-type),
+.facts > dd:not(:first-of-type) {
+  border-top: 1px solid var(--rule);
+}
+@media (max-width: 640px) {
+  .facts {
+    grid-template-columns: minmax(0, 1fr);
+  }
+  .facts > dt {
+    padding-bottom: 0;
+    border-top: 1px solid var(--rule);
+  }
+  .facts > dd {
+    padding-top: 0.125rem;
+    border-top: 0;
+  }
+  .facts > dt:first-of-type {
+    border-top: 0;
+  }
+}
+
+/* -------------------------------------------------------------- plate --- */
+
+/*
+ * Media is a plate: shown whole on a sunk ground, never cropped by us, with
+ * its particulars set beneath in mono. The crop is an editorial decision and
+ * the system does not get to make it silently.
+ */
+.plate {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--sunk);
+  border: 1px solid var(--rule);
+  overflow: hidden;
+}
+.plate img {
+  max-width: 100%;
+  max-height: 100%;
+  object-fit: contain;
+}
+
+/* ---------------------------------------------------------------- nav --- */
+
+.nav-link {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.375rem 0 0.375rem 0.875rem;
+  font-size: 0.875rem;
+  color: var(--ink-2);
+  transition: color 130ms ease;
+}
+.nav-link::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  top: 0.3125rem;
+  bottom: 0.3125rem;
+  width: 2px;
+  background: transparent;
+  transition: background-color 130ms ease;
+}
+.nav-link:hover {
+  color: var(--ink);
+}
+.nav-link:hover::before {
+  background: var(--rule);
+}
+.nav-link[data-active="true"] {
+  color: var(--ink);
+  font-weight: 500;
+}
+.nav-link[data-active="true"]::before {
+  background: var(--accent);
+}
+
+/*
+ * In the top bar the nav runs horizontally, so a rule on the left of the live
+ * item reads as a divider between two links rather than as a marker on one.
+ * Underline it instead.
+ */
+@media (max-width: 819px) {
+  .nav-link {
+    padding: 0.25rem 0 0.375rem;
+  }
+  .nav-link + .nav-link {
+    margin-left: 1.25rem;
+  }
+  .nav-link::before {
+    left: 0;
+    right: 0;
+    top: auto;
+    bottom: 0;
+    width: auto;
+    height: 2px;
+  }
+}
+
+/* Filters are text with a rule under the live one, not a row of pills. They
+   wrap rather than scroll, because a filter you cannot see is a filter you do
+   not know you have. */
+.filters {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0 1.25rem;
+  border-bottom: 1px solid var(--rule);
+}
+
+.filter {
+  display: inline-flex;
+  align-items: baseline;
+  gap: 0.375rem;
+  padding: 0.25rem 0;
+  border-bottom: 2px solid transparent;
+  font-size: 0.875rem;
+  color: var(--ink-3);
+  white-space: nowrap;
+  transition:
+    color 130ms ease,
+    border-color 130ms ease;
+}
+.filter:hover {
+  color: var(--ink);
+}
+.filter[data-active="true"] {
+  color: var(--ink);
+  font-weight: 500;
+  border-bottom-color: var(--accent);
+}
+.filter-count {
+  font-family: var(--font-mono);
+  font-size: 0.6875rem;
+  color: var(--ink-3);
+  font-variant-numeric: tabular-nums;
+}
+
+/* ------------------------------------------------------------ details --- */
+
+details > summary {
+  list-style: none;
+  cursor: pointer;
+}
+details > summary::-webkit-details-marker {
+  display: none;
+}
+.caret {
+  transition: transform 140ms ease;
+}
+details[open] .caret {
+  transform: rotate(90deg);
+}
+
+/* -------------------------------------------------------------- misc --- */
+
+.scroll-x {
+  overflow-x: auto;
+  scrollbar-width: thin;
+  scrollbar-color: var(--rule) transparent;
+}
+.scroll-x::-webkit-scrollbar {
+  height: 5px;
+}
+.scroll-x::-webkit-scrollbar-thumb {
+  background: var(--rule);
+}
+.hide-scrollbar {
+  scrollbar-width: none;
+}
+.hide-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+
+.link {
+  color: var(--accent);
+  text-decoration: underline;
+  text-decoration-thickness: 1px;
+  text-underline-offset: 3px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    transition-duration: 0.01ms !important;
+    animation-duration: 0.01ms !important;
+  }
 }
