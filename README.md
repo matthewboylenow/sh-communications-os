@@ -41,13 +41,36 @@ manual provider, which records what would have been sent and contacts nothing.
 
 ### 3. Schema and first user
 
-Locally, with `DATABASE_URL` in `.env.local`:
+The database has to exist before this step. Get the connection string from
+Neon's Connection Details, or from Vercel under Storage, or pull the whole
+environment down:
+
+```bash
+npx vercel link
+npx vercel env pull .env.local
+```
+
+Otherwise create `.env.local` at the repository root by hand:
+
+```
+DATABASE_URL="postgresql://user:pass@host.neon.tech/dbname?sslmode=require"
+AUTH_SECRET="..."
+AGENT_API_TOKEN="..."
+```
+
+Then:
 
 ```bash
 npm install
 npm run db:push     # creates the 11 tables
 npm run seed        # admin user, plus the real queue state from early August
 ```
+
+Both commands read `.env.local` first and fall back to `.env`. In a Codespace
+you can also just `export DATABASE_URL='...'` for the session.
+
+`npm run db:generate` writes migration SQL from the schema and needs no
+database, so it works before any of this.
 
 The seed reads `SEED_ADMIN_EMAIL` and `SEED_ADMIN_PASSWORD`. Change the password
 after the first sign in.
