@@ -62,7 +62,7 @@ describe("banned constructions", () => {
   });
 
   it("does not fire on a question that is not the opener", () => {
-    expect(rules("Groups start October 6. Questions? Email Carolyn.")).not.toContain(
+    expect(rules("Groups start October 6. Questions? Email the parish office.")).not.toContain(
       "pat.opening-question",
     );
   });
@@ -136,7 +136,7 @@ describe("the spec's own before and after", () => {
     "Are you looking for a way to deepen your faith journey and forge meaningful connections? Join us as we launch LifeLines, our transformative new small group ministry! LifeLines isn't just another program, it's a vibrant community where you can grow, connect, and serve alongside fellow parishioners. Whether you're new to the parish or a longtime member, there's a place for you. We can't wait to welcome you!";
 
   const good =
-    "LifeLines are our small groups, and new ones start October 6. Groups meet around a shared interest, anything from gardening to a book study to a support group, and most meet once or twice a month. Some are during the day, some in the evening. Browse the groups and sign up at sainthelen.org/lifelines. Questions? Contact Carolyn Colonna at ccolonna@sainthelen.org.";
+    "LifeLines are our small groups, and new ones start October 6. Groups meet around a shared interest, anything from gardening to a book study to a support group, and most meet once or twice a month. Some are during the day, some in the evening. Browse the groups and sign up at sainthelen.org/lifelines. Questions? Contact the parish office at office@sainthelen.org.";
 
   it("lights up the bad version", () => {
     const s = summarize(checkVoice(bad, { channel: "bulletin" }));

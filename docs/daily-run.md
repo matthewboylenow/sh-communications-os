@@ -105,7 +105,7 @@ POST /api/v1/flags
 { "flag": {
   "title": "Abide location still truncated",
   "detail": "Digest shows 'right after 5pm mass in M…'",
-  "owner": "Patricia Gomez",
+  "owner": "Abide lead",
   "severity": "blocking"
 }}
 ```

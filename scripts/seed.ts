@@ -28,7 +28,7 @@ const HUMAN = {
 };
 
 async function main() {
-  const email = (process.env.SEED_ADMIN_EMAIL ?? "mboyle@sainthelen.org").toLowerCase();
+  const email = (process.env.SEED_ADMIN_EMAIL ?? "admin@example.com").toLowerCase();
   const password = process.env.SEED_ADMIN_PASSWORD ?? "change-me-immediately";
 
   const existing = await db().select().from(users).where(eq(users.email, email)).limit(1);
@@ -41,7 +41,7 @@ async function main() {
       .insert(users)
       .values({
         email,
-        name: "Matthew Boyle",
+        name: process.env.SEED_ADMIN_NAME ?? "Communications Director",
         role: "admin",
         passwordHash: await bcrypt.hash(password, 10),
       })
@@ -168,11 +168,11 @@ async function main() {
       priority: "high",
       eventDate: new Date("2026-08-23T09:00:00-04:00"),
       ministry: "Social Concerns",
-      sourceMaterial: "Marielle's 7/31 email, flyer attached.",
+      sourceMaterial: "Social Concerns lead's 7/31 email, flyer attached.",
       missingInformation: [
         "Time from the flyer docx.",
         "Room from the flyer docx.",
-        "Paul Mecca still needs a reply about promotion guidelines.",
+        "The ministry contact still needs a reply about promotion guidelines.",
       ],
       approvalFlags: [],
     },
@@ -191,7 +191,7 @@ async function main() {
       publishAt: new Date("2026-08-11T17:00:00-04:00"),
       eventDate: new Date("2026-08-22T18:00:00-04:00"),
       ministry: "Abide Young Adult Ministry",
-      sourceMaterial: "Patricia Gomez, comms queue, 47 days waiting as of 8/5.",
+      sourceMaterial: "Abide lead via the comms queue, 47 days waiting as of 8/5.",
       missingInformation: ["Location, still truncated as 'in M…' in the digest."],
       notes:
         "Promo window opened Aug 10. This would also be the first ministry spotlight, since the rotation has never started.",
@@ -205,8 +205,8 @@ async function main() {
     {
       title: "Walking with Purpose wording still open",
       detail:
-        "Publication weekend is 8/8-8/9. Matthew's note to Maria on 8/5: 'can add but unsure what you meant by on the first page?'",
-      owner: "Maria",
+        "Publication weekend is 8/8-8/9. Note to the ministry lead on 8/5: 'can add but unsure what you meant by on the first page?'",
+      owner: "Walking with Purpose lead",
       ministry: "Walking with Purpose",
       severity: "blocking" as const,
       dueAt: new Date("2026-08-08T09:00:00-04:00"),
@@ -219,33 +219,33 @@ async function main() {
     },
     {
       title: "Abide location still truncated",
-      detail: "Digest shows 'right after 5pm mass in M…'. Get the room from Patricia Gomez.",
-      owner: "Patricia Gomez",
+      detail: "Digest shows 'right after 5pm mass in M…'. Get the room from the ministry lead.",
+      owner: "Abide lead",
       ministry: "Abide Young Adult Ministry",
       severity: "blocking" as const,
     },
     {
       title: "Blood drive time and room",
-      detail: "Both are on the flyer docx in Marielle's 7/31 email.",
+      detail: "Both are on the flyer docx in the Social Concerns lead's 7/31 email.",
       ministry: "Social Concerns",
       severity: "blocking" as const,
     },
     {
-      title: "Ireland posts must carry the Unitours line",
+      title: "Ireland posts must carry the tour operator line",
       detail:
-        "Per David at Unitours, 7/29: every Ireland announcement needs 'Click/scan here for the flyer with the itinerary and the Terms & Conditions.'",
+        "Per the tour operator, 7/29: every Ireland announcement needs 'Click/scan here for the flyer with the itinerary and the Terms & Conditions.'",
       severity: "attention" as const,
     },
     {
       title: "LifeLines September launch needs a green light",
       detail:
-        "Soft launch September, kickoff Wine & Cheese Sept 12-13 after all Masses. Joe Vaszily is in Atlanta that weekend. Team meeting Wed 8/26 5:30pm.",
+        "Soft launch September, kickoff Wine & Cheese Sept 12-13 after all Masses. The ministry lead is away that weekend. Team meeting Wed 8/26 5:30pm.",
       severity: "attention" as const,
     },
     {
       title: "Mental Health Ministry, Pope's August intention",
       detail: "Wording still needed, the attachment was unreadable. Wanted for the 8/8 weekend.",
-      owner: "Liz Migneco",
+      owner: "Mental Health Ministry lead",
       ministry: "Mental Health Ministry",
       severity: "attention" as const,
     },

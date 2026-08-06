@@ -9,7 +9,7 @@ product design brief. Section 4 records the selected direction and its tokens.
 
 ### Who uses it
 
-One person, most days. Matthew Boyle, communications director, working alone.
+One person, most days. The communications director, working alone.
 Usually a laptop at a desk, sometimes a phone while standing in a hallway at the
 parish, often in the evening. Later, possibly one or two staff editors who can
 write but cannot approve, and viewers who can only read.
@@ -68,12 +68,12 @@ paired with a sans, and a square rather than a rounded rectangle. Any direction
 that uses a geometric sans for headings and rounds every corner to 12px is
 fighting the parish's own mark for no reason.
 
-Second brand signal, from the art direction rules in the project brief. Matthew
-explicitly rejects praying hands, church buildings, crosses, sunset crosses and
-posed group photos as content imagery. That is a person with an allergy to the
-obvious ecclesiastical signifier. A design direction built out of arches and
-stained glass would be the interface equivalent of the photography he already
-said no to.
+Second brand signal, from the art direction rules in the project brief. The
+director explicitly rejects praying hands, church buildings, crosses, sunset
+crosses and posed group photos as content imagery. That is somebody with an
+allergy to the obvious ecclesiastical signifier. A design direction built out of
+arches and stained glass would be the interface equivalent of the photography
+they already said no to.
 
 ---
 
