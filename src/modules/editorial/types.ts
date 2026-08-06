@@ -1,4 +1,5 @@
 import { z } from "zod";
+import { briefSchema } from "./brief";
 
 export const PLATFORMS = [
   "facebook",
@@ -172,6 +173,8 @@ export const contentInputSchema = z.object({
   repetitionRisk: z.string().nullish(),
   relatedContentIds: z.array(z.string()).default([]),
   creativeBrief: z.string().nullish(),
+  brief: briefSchema.partial().default({}),
+  referenceUrl: z.string().nullish(),
   notes: z.string().nullish(),
 });
 export type ContentInput = z.infer<typeof contentInputSchema>;

@@ -5,6 +5,11 @@ import {
   PRIORITIES,
 } from "@/modules/editorial";
 import { listAssets } from "@/modules/assets";
+import {
+  BRIEF_HINTS,
+  BRIEF_LABELS,
+  BRIEF_REQUIRED,
+} from "@/modules/editorial";
 import { Masthead, SectionHead, Field } from "@/components/ui";
 import { createContentAction } from "../../actions";
 
@@ -67,6 +72,29 @@ export default async function NewContentPage() {
         </section>
 
         <section>
+          <SectionHead title="The picture" aside="the expensive part" />
+          <p className="apparatus mb-4">
+            Enough to make the graphic without deciding anything else. The rest of the fourteen
+            lines are on the edit screen.
+          </p>
+          <div className="space-y-5">
+            <Field
+              label="Reference link"
+              hint="A template, a collection, a stock search. Somewhere to start."
+            >
+              <input name="referenceUrl" className="input" placeholder="https://..." />
+            </Field>
+            <div className="grid gap-5 sm:grid-cols-2">
+              {BRIEF_REQUIRED.map((f) => (
+                <Field key={f} label={BRIEF_LABELS[f]} hint={BRIEF_HINTS[f]}>
+                  <input name={`brief_${f}`} className="input" />
+                </Field>
+              ))}
+            </div>
+          </div>
+        </section>
+
+        <section>
           <SectionHead title="Particulars" />
           <div className="grid gap-5 sm:grid-cols-2">
             <Field label="Content type">
@@ -109,8 +137,8 @@ export default async function NewContentPage() {
               </Field>
             </div>
             <div className="sm:col-span-2">
-              <Field label="Creative brief">
-                <textarea name="creativeBrief" rows={5} className="input" />
+              <Field label="Anything the brief fields do not cover">
+                <textarea name="creativeBrief" rows={4} className="input" />
               </Field>
             </div>
           </div>

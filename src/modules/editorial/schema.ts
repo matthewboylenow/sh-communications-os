@@ -8,6 +8,7 @@ import {
   index,
 } from "drizzle-orm/pg-core";
 import { createId } from "@/core/lib/ids";
+import type { Brief } from "./brief";
 import type {
   ApprovalFlag,
   ContentStatus,
@@ -50,6 +51,17 @@ export const contentItems = pgTable(
     ministry: text("ministry"),
     sourceMaterial: text("source_material"),
     creativeBrief: text("creative_brief"),
+    /**
+     * The fourteen named fields from the art direction rules. The free text
+     * creativeBrief above stays for anything the fields do not cover.
+     */
+    brief: jsonb("brief").$type<Brief>().notNull().default({}),
+    /**
+     * Somewhere to start: an Igniter or Sunday Social page, a Canva template,
+     * a stock search. Hotlinked and never fetched, because this is a reference
+     * to work from rather than a file anybody will publish.
+     */
+    referenceUrl: text("reference_url"),
     notes: text("notes"),
 
     approvalFlags: jsonb("approval_flags").$type<ApprovalFlag[]>().notNull().default([]),

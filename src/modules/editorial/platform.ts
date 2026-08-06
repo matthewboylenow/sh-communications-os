@@ -130,7 +130,10 @@ export type PlatformWarning = {
  * Checks that run before an item can be approved. Blockers stop approval.
  * Warnings are the voice spec's soft ceilings and only nag.
  */
-export function checkPlatforms(master: MasterDraft): PlatformWarning[] {
+export function checkPlatforms(
+  master: MasterDraft,
+  opts: { visualBriefed?: boolean } = {},
+): PlatformWarning[] {
   const warnings: PlatformWarning[] = [];
 
   for (const post of resolveAll(master)) {
@@ -151,11 +154,20 @@ export function checkPlatforms(master: MasterDraft): PlatformWarning[] {
         message: `${text.length} characters, over the ${limits.hardChars} limit. Needs a shorter override.`,
       });
     }
+    /*
+     * The media gate asks whether a picture can be made, not whether the
+     * database is holding one. The graphic gets made in Canva after the
+     * decision, so requiring an attached file here would mean nothing could
+     * ever be approved. A brief good enough to work from clears it; a warning
+     * still says the file is not here yet.
+     */
     if (limits.needsMedia && !post.assetId) {
       warnings.push({
         platform: post.platform,
-        level: "blocker",
-        message: "Needs an image or video.",
+        level: opts.visualBriefed ? "warning" : "blocker",
+        message: opts.visualBriefed
+          ? "Briefed but not made yet. The file goes up when you post."
+          : "Needs an image or video, or a brief good enough to make one.",
       });
     }
     if (limits.needsTitle && !post.title) {

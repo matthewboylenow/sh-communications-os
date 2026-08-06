@@ -96,13 +96,43 @@ npm run seed -- --user-only
 |---|---|
 | **Today** | Queue health, what is waiting on you, open flags, items past their useful date |
 | **Social queue** | One card per item with its blockers listed |
-| **Content detail** | The master draft, expandable platform deltas, voice check, approval |
+| **Content detail** | The draft as a proof, the picture brief, what each platform gets, approval |
 | **Assets** | Media library with rights and minor-release status |
+| **Visual trainer** | Teaches the system what good looks like, and exports it |
 | **Settings** | Which modules are live, which connections are configured |
 
 The queue targets 10 to 15 usable items. The Today screen says whether it is
 thin, healthy or overfull, which is what replaces "write three posts every day"
 with "write what is actually missing".
+
+### The picture is briefed, not stored
+
+The graphic gets made in Canva after the decision, and the caption gets pasted
+into Buffer by hand. So the portal's job is the part that is expensive, which is
+the idea, and not the part that is quick, which is the making.
+
+An item's visual is in one of three states, derived and never typed into a
+dropdown:
+
+- **Media attached**, a real file is in the library
+- **Briefed, not made yet**, no file, but six required brief lines and a
+  reference link to start from
+- **No visual plan**, neither
+
+Instagram and TikTok stop blocking approval once an item is briefed. Before this
+they hard-blocked on an attached file, which meant nothing could ever be
+approved, because the file does not exist until after the decision. The gate now
+asks whether the picture can be made in five minutes rather than whether the
+database is holding a JPEG.
+
+Brief fields are the fourteen from the art direction rules. Six of them are
+required: emotional purpose, subject, composition, negative space, what to
+avoid, and the exact search term or collection. Filling thirteen of fourteen and
+leaving the subject blank still counts as not briefed, because the gate has to
+be mechanical.
+
+Reference links are hotlinked and never fetched. They are somewhere to start,
+not a file anybody will publish, so they never touch the rights gate.
 
 ## The agent API
 

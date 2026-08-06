@@ -35,6 +35,20 @@ export type {
 export { TRANSITIONS, OPEN_STATUSES, canTransition } from "./status";
 
 export {
+  BRIEF_FIELDS,
+  BRIEF_LABELS,
+  BRIEF_HINTS,
+  BRIEF_REQUIRED,
+  VISUAL_STATUS_LABELS,
+  briefSchema,
+  filledFields,
+  missingRequired,
+  visualStatus,
+  briefGaps,
+} from "./brief";
+export type { BriefField, Brief, VisualStatus } from "./brief";
+
+export {
   resolvePlatform,
   resolveAll,
   renderedText,

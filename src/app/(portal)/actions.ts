@@ -5,6 +5,7 @@ import { redirect } from "next/navigation";
 import { signOut } from "@/core/auth";
 import { requireActor } from "@/core/auth/guards";
 import {
+  BRIEF_FIELDS,
   changeStatus,
   clearFlag,
   createContent,
@@ -41,6 +42,14 @@ function lines(fd: FormData, key: string) {
     .filter(Boolean);
 }
 
+
+/** The fourteen brief fields arrive as brief_<field> inputs. */
+function brief(fd: FormData) {
+  const out: Record<string, string | null> = {};
+  for (const f of BRIEF_FIELDS) out[f] = str(fd, `brief_${f}`);
+  return out;
+}
+
 export async function signOutAction() {
   await signOut({ redirectTo: "/login" });
 }
@@ -64,6 +73,8 @@ export async function createContentAction(fd: FormData) {
       sourceMaterial: str(fd, "sourceMaterial"),
       missingInformation: lines(fd, "missingInformation"),
       creativeBrief: str(fd, "creativeBrief"),
+      brief: brief(fd),
+      referenceUrl: str(fd, "referenceUrl"),
       notes: str(fd, "notes"),
     },
     a,
@@ -111,6 +122,8 @@ export async function updateContentAction(id: string, fd: FormData) {
       sourceMaterial: str(fd, "sourceMaterial"),
       missingInformation: lines(fd, "missingInformation"),
       creativeBrief: str(fd, "creativeBrief"),
+      brief: brief(fd),
+      referenceUrl: str(fd, "referenceUrl"),
       notes: str(fd, "notes"),
     },
     a,

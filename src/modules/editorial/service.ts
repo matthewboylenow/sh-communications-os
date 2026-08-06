@@ -25,6 +25,7 @@ import {
   type MasterDraft,
 } from "./platform";
 import { blockingFindings, checkVoice, type VoiceFinding } from "./voice";
+import { briefGaps, visualStatus, type VisualStatus } from "./brief";
 
 export type ActorRef = {
   id: string | null;
@@ -60,12 +61,20 @@ export type ReviewState = {
   uncleared: ApprovalFlag[];
   blockers: string[];
   canApprove: boolean;
+  /** Derived from the asset, the brief and the reference link. Never stored. */
+  visual: VisualStatus;
+  /** What is still missing before the visual counts as briefed. */
+  visualGaps: string[];
 };
 
 export function review(row: ContentItemRow): ReviewState {
   const master = toMaster(row);
   const resolved = resolveAll(master);
-  const platformIssues = checkPlatforms(master);
+
+  const visual = visualStatus(row);
+  const platformIssues = checkPlatforms(master, {
+    visualBriefed: visual !== "needed",
+  });
   const voice = checkVoice(row.masterCaption, { channel: row.platforms[0] });
   const uncleared = row.approvalFlags.filter((f) => !row.clearedFlags.includes(f));
 
@@ -92,6 +101,8 @@ export function review(row: ContentItemRow): ReviewState {
     uncleared,
     blockers,
     canApprove: blockers.length === 0,
+    visual,
+    visualGaps: briefGaps(row),
   };
 }
 

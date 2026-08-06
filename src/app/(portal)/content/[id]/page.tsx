@@ -1,3 +1,4 @@
+import { Fragment } from "react";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import {
@@ -6,6 +7,12 @@ import {
   review,
   renderedText,
   APPROVAL_FLAG_LABELS,
+  BRIEF_FIELDS,
+  BRIEF_HINTS,
+  BRIEF_LABELS,
+  BRIEF_REQUIRED,
+  VISUAL_STATUS_LABELS,
+  filledFields,
   PLATFORMS,
   PLATFORM_LABELS,
   PLATFORM_LIMITS,
@@ -28,6 +35,7 @@ import {
   joinMeta,
 } from "@/components/ui";
 import { Proof, type ExtraNote } from "@/components/proof";
+import { CopyButton } from "@/components/copy";
 import { changeStatusAction, clearFlagAction, updateContentAction } from "../../actions";
 
 export const dynamic = "force-dynamic";
@@ -90,6 +98,11 @@ export default async function ContentDetail({
     ...state.uncleared.map((f) => ({
       level: "flag" as const,
       message: `${APPROVAL_FLAG_LABELS[f]}, not cleared.`,
+    })),
+    ...state.visualGaps.map((m) => ({
+      level: "missing" as const,
+      message: m,
+      href: `${back}?edit=1#brief`,
     })),
     ...assetIssues.map((m) => ({ level: "error" as const, message: m, href: "/assets" })),
   ];
@@ -197,44 +210,93 @@ export default async function ContentDetail({
             </section>
           ) : null}
 
-          {asset ? (
-            <section>
-              <SectionHead title="Media" />
-              <div className="galley">
-                {/* A plate when there is something to look at. A single line
-                    when there is not, because a large empty rectangle tells a
-                    person nothing they did not already know. */}
-                {asset.thumbnailUrl ? (
-                  <div className="plate aspect-4/3 max-h-[20rem] w-full">
-                    {/* eslint-disable-next-line @next/next/no-img-element */}
-                    <img src={asset.thumbnailUrl} alt="" />
-                  </div>
+<section>
+            <SectionHead
+              title="The picture"
+              aside={VISUAL_STATUS_LABELS[state.visual]}
+            />
+            <div className="galley">
+              <div>
+                {asset ? (
+                  <>
+                    {asset.thumbnailUrl ? (
+                      <div className="plate aspect-4/3 max-h-[20rem] w-full">
+                        {/* eslint-disable-next-line @next/next/no-img-element */}
+                        <img src={asset.thumbnailUrl} alt="" />
+                      </div>
+                    ) : (
+                      <div className="plate h-20 w-full">
+                        <span className="mark">{asset.type}, no preview available</span>
+                      </div>
+                    )}
+                    <p className="mt-2 text-[0.9375rem]">{asset.title}</p>
+                  </>
+                ) : null}
+
+                {/*
+                  The brief is the deliverable when there is no file, because
+                  the graphic gets made afterwards. Fourteen named lines so
+                  there is nothing left to decide with Canva already open.
+                */}
+                {filledFields(item.brief).length ? (
+                  <dl className={`facts ${asset ? "mt-6" : ""}`}>
+                    {BRIEF_FIELDS.filter((f) => (item.brief?.[f] ?? "").trim()).map((f) => (
+                      <Fragment key={f}>
+                        <dt>{BRIEF_LABELS[f]}</dt>
+                        <dd>{item.brief?.[f]}</dd>
+                      </Fragment>
+                    ))}
+                  </dl>
                 ) : (
-                  <div className="plate h-20 w-full">
-                    <span className="mark">{asset.type}, no preview available</span>
-                  </div>
-                )}
-                <div className="margin-note">
-                  <p className="text-[0.9375rem]">{asset.title}</p>
-                  <p className="mark mt-1.5">
-                    {joinMeta([
-                      asset.source,
-                      asset.orientation ?? "orientation unknown",
-                      `rights ${asset.rightsStatus}`,
-                    ])}
+                  <p className="read text-ink-2">
+                    No brief yet. Without one somebody has to invent the picture at eight in
+                    the evening, which is the thing this is here to prevent.
                   </p>
-                  {asset.minorReleaseStatus === "unconfirmed" ? (
-                    <p className="note mt-2.5" data-level="error">
-                      <span className="note-glyph" aria-hidden="true">
-                        §
-                      </span>
-                      <span>Shows a minor and the release is unconfirmed.</span>
-                    </p>
-                  ) : null}
-                </div>
+                )}
+
+                {item.creativeBrief ? (
+                  <p className="read mt-6 whitespace-pre-line text-ink-2">
+                    {item.creativeBrief}
+                  </p>
+                ) : null}
               </div>
-            </section>
-          ) : null}
+
+              <div className="margin-note">
+                <p className="mark">
+                  {filledFields(item.brief).length} of {BRIEF_FIELDS.length} lines filled
+                </p>
+
+                {item.referenceUrl ? (
+                  <p className="mt-3">
+                    <a
+                      href={item.referenceUrl}
+                      target="_blank"
+                      rel="noreferrer"
+                      className="link text-sm break-words"
+                    >
+                      Start here
+                    </a>
+                    <span className="mark mt-1 block break-words">{item.referenceUrl}</span>
+                  </p>
+                ) : (
+                  <p className="mark mt-3">No reference link.</p>
+                )}
+
+                {state.visualGaps.length ? (
+                  <div className="mt-4">
+                    {state.visualGaps.map((g) => (
+                      <p key={g} className="note" data-level="warning">
+                        <span className="note-glyph" aria-hidden="true">
+                          ◇
+                        </span>
+                        <span>{g}</span>
+                      </p>
+                    ))}
+                  </div>
+                ) : null}
+              </div>
+            </div>
+          </section>
 
           <section>
             <SectionHead
@@ -255,11 +317,14 @@ export default async function ContentDetail({
                   return (
                     <li key={p} className="galley py-3.5">
                       <div>
-                        <div className="flex flex-wrap items-baseline justify-between gap-x-4">
+                        <div className="flex flex-wrap items-center justify-between gap-x-4 gap-y-2">
                           <h3 className="head">{PLATFORM_LABELS[p]}</h3>
-                          <span className={`mark ${over ? "text-accent" : ""}`}>
-                            {rendered.length}
-                            {limits.hardChars < 3000 ? ` / ${limits.hardChars}` : ""} chars
+                          <span className="flex items-center gap-3">
+                            <span className={`mark ${over ? "text-accent" : ""}`}>
+                              {rendered.length}
+                              {limits.hardChars < 3000 ? ` / ${limits.hardChars}` : ""} chars
+                            </span>
+                            <CopyButton text={rendered} label="Copy" />
                           </span>
                         </div>
                         {/*
@@ -284,6 +349,19 @@ export default async function ContentDetail({
                         ) : (
                           <p className="mark">word for word the master</p>
                         )}
+                        {/* Warnings are not blockers, so they never reach the
+                            proof marks. They still need saying somewhere, and
+                            beside the platform they concern is that place. */}
+                        {state.platformIssues
+                          .filter((i) => i.platform === p && i.level !== "blocker")
+                          .map((i) => (
+                            <p key={i.message} className="note mt-2" data-level="warning">
+                              <span className="note-glyph" aria-hidden="true">
+                                !
+                              </span>
+                              <span>{i.message}</span>
+                            </p>
+                          ))}
                       </div>
                     </li>
                   );
@@ -324,13 +402,6 @@ export default async function ContentDetail({
               <dt>Repetition risk</dt>
               <dd>{item.repetitionRisk ?? <Blank />}</dd>
             </dl>
-
-            {item.creativeBrief ? (
-              <div className="mt-8 max-w-[40rem]">
-                <h3 className="label mb-2">Creative brief</h3>
-                <p className="read whitespace-pre-line text-ink-2">{item.creativeBrief}</p>
-              </div>
-            ) : null}
 
             {item.notes ? (
               <div className="mt-6 max-w-[40rem]">
@@ -567,6 +638,58 @@ function EditForm({
         )}
       </section>
 
+      <section id="brief" className="scroll-mt-8">
+        <SectionHead
+          title="The picture"
+          aside={`${filledFields(item.brief).length} of ${BRIEF_FIELDS.length}`}
+        />
+        <p className="apparatus mb-4 max-w-[40rem]">
+          The six marked required are the ones you cannot open Canva without. Fill those and
+          give a reference link, and the platforms that want media stop blocking approval.
+        </p>
+
+        <div className="max-w-[40rem] space-y-5">
+          <Field
+            label="Reference link"
+            hint="An Igniter or Sunday Social page, a Canva template, a stock search. Never fetched, just somewhere to start."
+          >
+            <input
+              name="referenceUrl"
+              defaultValue={item.referenceUrl ?? ""}
+              className="input"
+              placeholder="https://..."
+            />
+          </Field>
+
+          <div className="grid gap-5 sm:grid-cols-2">
+            {BRIEF_FIELDS.map((f) => (
+              <Field
+                key={f}
+                label={
+                  BRIEF_REQUIRED.includes(f) ? `${BRIEF_LABELS[f]} (required)` : BRIEF_LABELS[f]
+                }
+                hint={BRIEF_HINTS[f]}
+              >
+                <input
+                  name={`brief_${f}`}
+                  defaultValue={item.brief?.[f] ?? ""}
+                  className="input"
+                />
+              </Field>
+            ))}
+          </div>
+
+          <Field label="Anything the fields do not cover">
+            <textarea
+              name="creativeBrief"
+              defaultValue={item.creativeBrief ?? ""}
+              rows={4}
+              className="input"
+            />
+          </Field>
+        </div>
+      </section>
+
       <section>
         <SectionHead title="Particulars" />
         <div className="grid max-w-[40rem] gap-5 sm:grid-cols-2">
@@ -626,16 +749,6 @@ function EditForm({
                 name="missingInformation"
                 defaultValue={item.missingInformation.join("\n")}
                 rows={3}
-                className="input"
-              />
-            </Field>
-          </div>
-          <div className="sm:col-span-2">
-            <Field label="Creative brief">
-              <textarea
-                name="creativeBrief"
-                defaultValue={item.creativeBrief ?? ""}
-                rows={6}
                 className="input"
               />
             </Field>
