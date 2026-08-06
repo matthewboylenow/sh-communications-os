@@ -1,0 +1,17 @@
+{
+  "note": "The controlled Canva template library. Eight to twelve templates, no more. Fill in ids as they are built, then pick one instead of designing from nothing.",
+  "templates": [
+    { "key": "event-reminder", "name": "Event reminder", "canvaId": null, "fields": ["headline", "subhead", "date", "photo", "colour"] },
+    { "key": "registration-deadline", "name": "Registration deadline", "canvaId": null, "fields": ["headline", "deadline", "link", "photo"] },
+    { "key": "tonight", "name": "Tonight at Saint Helen", "canvaId": null, "fields": ["headline", "time", "place", "photo"] },
+    { "key": "weekend-invitation", "name": "Weekend invitation", "canvaId": null, "fields": ["headline", "times", "photo"] },
+    { "key": "scripture-quote", "name": "Scripture or homily quote", "canvaId": null, "fields": ["quote", "attribution", "reference", "colour"] },
+    { "key": "volunteer-need", "name": "Volunteer need", "canvaId": null, "fields": ["headline", "ask", "contact", "photo"] },
+    { "key": "ministry-spotlight", "name": "Ministry spotlight", "canvaId": null, "fields": ["ministry", "headline", "photo"] },
+    { "key": "clip", "name": "Podcast or video clip", "canvaId": null, "fields": ["hook", "speaker", "still"] },
+    { "key": "thank-you", "name": "Thank you or recap", "canvaId": null, "fields": ["headline", "photo"] },
+    { "key": "seasonal-prayer", "name": "Seasonal prayer", "canvaId": null, "fields": ["text", "season", "colour"] },
+    { "key": "schedule-change", "name": "Schedule change", "canvaId": null, "fields": ["what", "when", "why"] },
+    { "key": "major-announcement", "name": "Major announcement", "canvaId": null, "fields": ["headline", "subhead", "date", "photo"] }
+  ]
+}

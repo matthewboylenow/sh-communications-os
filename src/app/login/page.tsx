@@ -30,7 +30,7 @@ export default async function LoginPage({
   }
 
   return (
-    <div className="flex min-h-dvh flex-col justify-center px-6 sm:px-10">
+    <div className="flex min-h-dvh flex-col items-center justify-center px-6">
       <div className="w-full max-w-[24rem]">
         <div className="flex items-center gap-3">
           <Medallion size={28} className="text-accent" />

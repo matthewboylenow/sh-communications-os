@@ -85,12 +85,15 @@ export default async function PortalLayout({ children }: { children: React.React
       </aside>
 
       {/*
-        The composition stays left aligned. Slack on a wide monitor goes to the
-        right of the margin track rather than being split, so the measure sits
-        in the same place at 1280px and at 2560px.
+        The container is exactly the width of the galley: 40rem of measure,
+        2.5rem of gutter, 16.5rem of margin. Setting it to 59rem and centring
+        it means the composition sits in the middle of the page with no slack
+        inside it, while the two track asymmetry stays intact.
       */}
       <main className="min-w-0 flex-1">
-        <div className="max-w-[64rem] px-5 py-8 pb-24 sm:px-10 min-[820px]:py-12">{children}</div>
+        <div className="mx-auto w-full max-w-[59rem] px-5 py-8 pb-24 sm:px-8 min-[820px]:py-12">
+          {children}
+        </div>
       </main>
     </div>
   );
@@ -98,8 +101,8 @@ export default async function PortalLayout({ children }: { children: React.React
 
 function SetupNotice() {
   return (
-    <div className="flex min-h-dvh flex-col justify-center px-6 sm:px-10">
-      <div className="max-w-[34rem]">
+    <div className="flex min-h-dvh flex-col items-center justify-center px-6">
+      <div className="w-full max-w-[34rem]">
         <Medallion size={24} className="text-accent" />
         <h1 className="masthead-title mt-4">Almost there</h1>
         <p className="read mt-3">

@@ -16,7 +16,7 @@ import {
   type Platform,
   type Priority,
 } from "@/modules/editorial";
-import { createAsset } from "@/modules/assets";
+import { createAsset, ingestFromUrl } from "@/modules/assets";
 
 async function actor(cap: Parameters<typeof requireActor>[0]): Promise<ActorRef> {
   const a = await requireActor(cap);
@@ -137,6 +137,36 @@ export async function resolveFlagAction(id: string, note?: string) {
   await requireActor("content.write");
   await resolveOpenFlag(id, note);
   revalidatePath("/");
+}
+
+/**
+ * Fetch a public image URL and keep our own copy. This is the path for Sunday
+ * Social, Igniter, Canva exports and stock: paste the direct file link, we
+ * store the bytes, and what goes to a publishing provider is a URL we control.
+ */
+export async function ingestAssetAction(fd: FormData) {
+  const a = await requireActor("asset.write");
+  const url = str(fd, "url");
+  if (!url) return;
+  await ingestFromUrl(
+    url,
+    {
+      title: str(fd, "title") ?? "Untitled",
+      type: (str(fd, "type") ?? "graphic") as never,
+      source: (str(fd, "source") ?? "other") as never,
+      sourceUrl: str(fd, "sourceUrl"),
+      tags: (str(fd, "tags") ?? "").split(",").map((t) => t.trim()).filter(Boolean),
+      ministries: [],
+      people: [],
+      rightsStatus: (str(fd, "rightsStatus") ?? "unknown") as never,
+      rightsNotes: str(fd, "rightsNotes"),
+      minorReleaseStatus: (str(fd, "minorReleaseStatus") ?? "not_applicable") as never,
+      notes: str(fd, "notes"),
+    },
+    a.id,
+  );
+  revalidatePath("/assets");
+  revalidatePath("/visual");
 }
 
 export async function createAssetAction(fd: FormData) {

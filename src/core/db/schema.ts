@@ -12,3 +12,4 @@ export * from "./core-schema";
 export * from "@/modules/editorial/schema";
 export * from "@/modules/assets/schema";
 export * from "@/modules/publishing/schema";
+export * from "@/modules/visual/schema";

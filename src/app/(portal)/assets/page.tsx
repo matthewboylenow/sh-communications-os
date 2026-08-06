@@ -1,6 +1,6 @@
 import { listAssets, ASSET_SOURCES, ASSET_TYPES, ASSET_SOURCE_LABELS } from "@/modules/assets";
 import { Masthead, SectionHead, Empty, Field, StatusTone, fmtDate, joinMeta } from "@/components/ui";
-import { createAssetAction } from "../actions";
+import { createAssetAction, ingestAssetAction } from "../actions";
 
 export const dynamic = "force-dynamic";
 
@@ -19,12 +19,77 @@ export default async function AssetsPage({
         lede="Media has to live at a public, non expiring URL. Providers fetch it at publish time, not when you schedule."
       />
 
+      <details className="border-t border-rule py-3.5">
+        <summary className="flex items-baseline gap-2 text-[0.9375rem]">
+          <span className="caret mark" aria-hidden="true">
+            &#8250;
+          </span>
+          Bring in a picture from a link
+        </summary>
+
+        <div className="galley mt-5">
+          <form action={ingestAssetAction} className="grid gap-5 sm:grid-cols-2">
+            <div className="sm:col-span-2">
+              <Field
+                label="Direct link to the file"
+                hint="Has to end at the image itself, not the page it sits on."
+              >
+                <input
+                  name="url"
+                  required
+                  className="input"
+                  placeholder="https://.../save-me-a-seat.jpg"
+                />
+              </Field>
+            </div>
+            <Field label="Title">
+              <input name="title" required className="input" />
+            </Field>
+            <Field label="Where it came from">
+              <select name="source" className="input" defaultValue="igniter">
+                {ASSET_SOURCES.map((s) => (
+                  <option key={s} value={s}>
+                    {ASSET_SOURCE_LABELS[s]}
+                  </option>
+                ))}
+              </select>
+            </Field>
+            <Field label="Rights">
+              <select name="rightsStatus" className="input" defaultValue="approved">
+                <option value="approved">Licensed for parish use</option>
+                <option value="restricted">Restricted</option>
+                <option value="unknown">Not checked yet</option>
+              </select>
+            </Field>
+            <Field label="Tags" hint="Comma separated.">
+              <input name="tags" className="input" />
+            </Field>
+            <div className="sm:col-span-2">
+              <button className="btn btn-ink">Fetch and keep a copy</button>
+            </div>
+          </form>
+
+          <div className="margin-note">
+            <p className="mark">
+              The file is fetched once and stored under our own URL, not linked to where it
+              lives now. Publishing providers fetch media at publish time, so a link that works
+              on Thursday and breaks on Sunday morning is the failure this avoids.
+            </p>
+            <p className="mark mt-3">
+              For Sunday Social and Igniter that means downloading under the subscription the
+              parish already pays for, then bringing the file here. Pointing at their servers is
+              not what the licence covers and is not something to build a Sunday on.
+            </p>
+          </div>
+        </div>
+      </details>
+
       <details className="border-y border-rule py-3.5">
         <summary className="flex items-baseline gap-2 text-[0.9375rem]">
           <span className="caret mark" aria-hidden="true">
             &#8250;
           </span>
-          Add an asset
+          Add an asset by hand
         </summary>
         <form action={createAssetAction} className="mt-5 grid max-w-[40rem] gap-5 sm:grid-cols-2">
           <Field label="Title">

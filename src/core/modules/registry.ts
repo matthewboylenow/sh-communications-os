@@ -86,7 +86,7 @@ export const MODULES: Record<ModuleId, ModuleManifest> = {
       "Learns Matthew's visual taste through explicit choices and exports a style guide the creative brief step reads.",
     tablePrefix: "vt_",
     phase: 2,
-    enabled: false,
+    enabled: true,
     dependsOn: ["assets"],
     ports: [],
     nav: { href: "/visual", label: "Visual trainer", order: 30 },

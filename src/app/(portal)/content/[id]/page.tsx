@@ -650,7 +650,7 @@ function EditForm({
 
       {/* Sits against the bottom of the window so a long form never hides the
           one control that matters. */}
-      <div className="sticky bottom-0 -mx-5 flex flex-wrap items-center gap-4 border-t border-rule bg-paper px-5 py-3.5 sm:-mx-10 sm:px-10">
+      <div className="sticky bottom-0 -mx-5 flex flex-wrap items-center gap-4 border-t border-rule bg-paper px-5 py-3.5 sm:-mx-8 sm:px-8">
         <button type="submit" className="btn btn-ink">
           Save
         </button>

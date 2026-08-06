@@ -279,6 +279,12 @@ body > * {
   max-width: 40rem;
 }
 
+/* Spans both tracks. For the one kind of content that is not prose and has no
+   business being squeezed into a reading measure: a picture being judged. */
+.galley-full {
+  grid-column: 1 / -1;
+}
+
 /* A margin mark. Never louder than the prose it annotates. */
 .note {
   display: grid;

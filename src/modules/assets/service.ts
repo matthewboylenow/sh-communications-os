@@ -126,6 +126,78 @@ export async function uploadAsset(
   });
 }
 
+/**
+ * Fetch a public URL once and store the bytes ourselves.
+ *
+ * This is the honest way to use a link from anywhere: Sunday Social, Igniter,
+ * Canva, Unsplash, a parish photographer's Dropbox. We do NOT keep pointing at
+ * somebody else's CDN, for two reasons that both end badly on a Sunday.
+ *
+ *  1. Publishing providers fetch media at publish time, not at schedule time.
+ *     A link that works when you queue the post on Thursday and 404s on Sunday
+ *     morning is the exact failure this system exists to prevent.
+ *  2. Hotlinking a paid library's CDN is not what a licence covers. Downloading
+ *     under the subscription you already pay for, and serving it from your own
+ *     storage, is.
+ *
+ * Without blob storage configured there is nowhere to put the bytes, so the
+ * remote URL is kept and the asset is marked as a link we do not control. It
+ * will work, and it is the fragile option, and it says so.
+ */
+export async function ingestFromUrl(
+  url: string,
+  meta: Omit<AssetInput, "fileUrl" | "thumbnailUrl">,
+  createdBy: string | null,
+) {
+  let res: Response;
+  try {
+    res = await fetch(url, { redirect: "follow" });
+  } catch {
+    throw new Error("That URL could not be reached from the server.");
+  }
+  if (!res.ok) {
+    throw new Error(`That URL returned ${res.status}. It has to be publicly readable.`);
+  }
+
+  const contentType = (res.headers.get("content-type") ?? "").split(";")[0].trim();
+  if (!/^(image|video)\//.test(contentType)) {
+    throw new Error(
+      `That URL returned ${contentType || "no content type"}, not an image or a video. ` +
+        "A gallery or product page will not work. The link has to point at the file itself.",
+    );
+  }
+
+  if (!blobStorage.isConfigured()) {
+    return createAsset(
+      {
+        ...meta,
+        fileUrl: url,
+        thumbnailUrl: url,
+        notes: [meta.notes, "Remote link, not stored by us. Set BLOB_READ_WRITE_TOKEN to fix."]
+          .filter(Boolean)
+          .join(" "),
+      },
+      createdBy,
+    );
+  }
+
+  const blob = await res.blob();
+  const ext = contentType.split("/")[1]?.replace(/[^a-z0-9]/g, "") ?? "bin";
+  const safe = meta.title.replace(/[^a-zA-Z0-9._-]+/g, "-").toLowerCase().slice(0, 60);
+  const key = `assets/${Date.now()}-${safe}.${ext}`;
+  const stored = await blobStorage.put(key, blob, { contentType });
+
+  const row = await createAsset(
+    { ...meta, fileUrl: stored.publicUrl, thumbnailUrl: stored.publicUrl, sourceUrl: meta.sourceUrl ?? url },
+    createdBy,
+  );
+  await db()
+    .update(assets)
+    .set({ storageKey: key, byteSize: stored.size, contentType })
+    .where(eq(assets.id, row.id));
+  return row;
+}
+
 export async function updateAsset(id: string, patch: Partial<AssetInput>) {
   const [row] = await db()
     .update(assets)
@@ -142,6 +214,27 @@ export async function updateAsset(id: string, patch: Partial<AssetInput>) {
     .where(eq(assets.id, id))
     .returning();
   return row;
+}
+
+/**
+ * Written by the visual module, and only by the visual module.
+ *
+ * The rating itself lives in vt_preferences, which the visual module owns.
+ * This mirrors it onto the asset so the library and the suggestion step can
+ * read taste without querying across a module boundary. Assets stores it and
+ * never decides it.
+ */
+export async function setPreference(
+  assetId: string,
+  rating: "approved" | "maybe" | "rejected",
+  reasons: string[] = [],
+) {
+  const [row] = await db()
+    .update(assets)
+    .set({ preferenceRating: rating, preferenceReasons: reasons, updatedAt: new Date() })
+    .where(eq(assets.id, assetId))
+    .returning();
+  return row ?? null;
 }
 
 export async function recordUsage(
